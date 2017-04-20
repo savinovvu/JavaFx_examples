@@ -1,4 +1,4 @@
-package ru.inbox.savinov_vu.interfaces;
+package ru.inbox.savinov_vu.mockBD;
 
 import ru.inbox.savinov_vu.model.Person;
 
