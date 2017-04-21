@@ -1,14 +1,13 @@
 package ru.inbox.savinov_vu.mockBD.impls;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import ru.inbox.savinov_vu.mockBD.AddressBook;
 import ru.inbox.savinov_vu.model.Person;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class CollectionAddressBook implements AddressBook {
 
-    private List<Person> personList = new ArrayList<>();
+    private static ObservableList<Person> personList = FXCollections.observableArrayList();
 
     @Override
     public void add(Person person) {
@@ -25,7 +24,17 @@ public class CollectionAddressBook implements AddressBook {
         personList.remove(person);
     }
 
-    public List<Person> getPersonList() {
+    public ObservableList<Person> getPersonList() {
         return personList;
+    }
+
+
+    public void fillTestData() {
+        personList.add(new Person("Иванов иван", "203948"));
+        personList.add(new Person("Петров Петр", "65464654"));
+        personList.add(new Person("Бегемотов бегемот", "123234234"));
+        personList.add(new Person("Хороший хорош", "234234234"));
+
+        personList.add(new Person("Моржов морж", "65432"));
     }
 }

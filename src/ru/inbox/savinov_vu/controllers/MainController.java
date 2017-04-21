@@ -1,22 +1,29 @@
 package ru.inbox.savinov_vu.controllers;
 
 
+import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import ru.inbox.savinov_vu.mockBD.impls.CollectionAddressBook;
+import ru.inbox.savinov_vu.model.Person;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
 
-public class MainController {
+public class MainController implements Initializable {
+
+    CollectionAddressBook addressBook = new CollectionAddressBook();
+
     @FXML
     private Button btnAdd;
 
@@ -38,6 +45,16 @@ public class MainController {
     @FXML
     private Label labelCount;
 
+    @FXML
+    private TableColumn<Person, String> columnFIO;
+    @FXML
+    private TableColumn<Person, String> columnPhone;
+
+
+
+    private void updateCountLabel() {
+     labelCount.setText("Количество записей: " + addressBook.getPersonList().size());
+    }
 
 
     public void showDialog(ActionEvent actionEvent) {
@@ -59,4 +76,15 @@ public class MainController {
     }
 
 
+    @Override
+    @FXML
+    public void initialize(URL location, ResourceBundle resources) {
+        columnFIO.setCellValueFactory(new PropertyValueFactory<Person, String>("fio"));
+        columnPhone.setCellValueFactory(new PropertyValueFactory<Person, String>("phone"));
+
+        addressBook.getPersonList().addListener((ListChangeListener.Change<? extends Person> c)-> updateCountLabel());
+        addressBook.fillTestData();
+        tableAddressBook.setItems(addressBook.getPersonList());
+        updateCountLabel();
     }
+}

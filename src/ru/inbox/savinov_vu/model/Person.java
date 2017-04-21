@@ -19,4 +19,13 @@ public class Person {
     public void setPhone(String phone) {
         this.phone = phone;
     }
+
+    public Person(String fio, String phone) {
+        this.fio = fio;
+        this.phone = phone;
+    }
+
+    public Person() {
+
+    }
 }
