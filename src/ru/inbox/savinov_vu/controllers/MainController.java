@@ -58,6 +58,26 @@ public class MainController implements Initializable {
 
 
     public void showDialog(ActionEvent actionEvent) {
+
+        Object source = actionEvent.getSource();
+
+        if (!(source instanceof Button)) {
+            return;
+        }
+        Button clickedButton = (Button) source;
+        Person selectedPerson = (Person) tableAddressBook.getSelectionModel().getSelectedItem();
+        switch (clickedButton.getId()) {
+            case "btnAdd":
+                System.out.println("add " + selectedPerson);
+                break;
+            case "btnEdit":
+                System.out.println("edit " + selectedPerson);
+                break;
+            case "btnDelete":
+                System.out.println("delete " + selectedPerson);
+                return;
+        }
+
         try {
             btnAdd.setText("clicked");
             Stage stage = new Stage();
@@ -79,6 +99,7 @@ public class MainController implements Initializable {
     @Override
     @FXML
     public void initialize(URL location, ResourceBundle resources) {
+        tableAddressBook.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         columnFIO.setCellValueFactory(new PropertyValueFactory<Person, String>("fio"));
         columnPhone.setCellValueFactory(new PropertyValueFactory<Person, String>("phone"));
 
