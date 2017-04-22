@@ -6,7 +6,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -23,6 +22,8 @@ import java.util.ResourceBundle;
 public class MainController implements Initializable {
 
     CollectionAddressBook addressBook = new CollectionAddressBook();
+
+    private Stage mainStage;
 
     @FXML
     private Button btnAdd;
@@ -50,14 +51,18 @@ public class MainController implements Initializable {
     @FXML
     private TableColumn<Person, String> columnPhone;
 
+    private Parent fxmlEdit;
+    private FXMLLoader fxmlLoader = new FXMLLoader();
+    private EditDialogController editDialogController;
+    private Stage editDialogStage;
 
 
     private void updateCountLabel() {
-     labelCount.setText("Количество записей: " + addressBook.getPersonList().size());
+        labelCount.setText("Количество записей: " + addressBook.getPersonList().size());
     }
 
 
-    public void showDialog(ActionEvent actionEvent) {
+    public void actionButtonPressed(ActionEvent actionEvent) {
 
         Object source = actionEvent.getSource();
 
@@ -65,34 +70,37 @@ public class MainController implements Initializable {
             return;
         }
         Button clickedButton = (Button) source;
-        Person selectedPerson = (Person) tableAddressBook.getSelectionModel().getSelectedItem();
         switch (clickedButton.getId()) {
             case "btnAdd":
-                System.out.println("add " + selectedPerson);
+                editDialogController.setPerson(new Person());
+                showDialog();
+                addressBook.add(editDialogController.getPerson());
                 break;
             case "btnEdit":
-                System.out.println("edit " + selectedPerson);
+                editDialogController.setPerson((Person) tableAddressBook.getSelectionModel().getSelectedItem());
+                showDialog();
                 break;
             case "btnDelete":
-                System.out.println("delete " + selectedPerson);
+                addressBook.delete((Person) tableAddressBook.getSelectionModel().getSelectedItem());
                 return;
         }
 
-        try {
-            btnAdd.setText("clicked");
-            Stage stage = new Stage();
-            Parent root = FXMLLoader.load(getClass().getResource("../fxml/edit.fxml"));
-            stage.setTitle("Редактирование записи");
-            stage.setMinHeight(150);
-            stage.setMinWidth(300);
-            stage.setResizable(false);
-            stage.setScene(new Scene(root));
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(((Node) actionEvent.getSource()).getScene().getWindow());
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
+
+    }
+
+    private void showDialog() {
+        if (editDialogStage == null) {
+            editDialogStage = new Stage();
+            editDialogStage.setTitle("Редактирование записи");
+            editDialogStage.setMinHeight(150);
+            editDialogStage.setMinWidth(300);
+            editDialogStage.setResizable(false);
+            editDialogStage.setScene(new Scene(fxmlEdit));
+            editDialogStage.initModality(Modality.WINDOW_MODAL);
+            editDialogStage.initOwner(mainStage);
         }
+
+        editDialogStage.showAndWait();
     }
 
 
@@ -103,9 +111,40 @@ public class MainController implements Initializable {
         columnFIO.setCellValueFactory(new PropertyValueFactory<Person, String>("fio"));
         columnPhone.setCellValueFactory(new PropertyValueFactory<Person, String>("phone"));
 
-        addressBook.getPersonList().addListener((ListChangeListener.Change<? extends Person> c)-> updateCountLabel());
+        initListeners();
+
+        fillData();
+        initLoader();
+    }
+
+    private void fillData() {
         addressBook.fillTestData();
         tableAddressBook.setItems(addressBook.getPersonList());
-        updateCountLabel();
+    }
+
+    private void initLoader() {
+        try {
+            fxmlLoader.setLocation(getClass().getResource("../fxml/edit.fxml"));
+            fxmlEdit = fxmlLoader.load();
+            editDialogController = fxmlLoader.getController();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void initListeners() {
+        addressBook.getPersonList().addListener((ListChangeListener.Change<? extends Person> c) -> updateCountLabel());
+        tableAddressBook.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                editDialogController.setPerson((Person) tableAddressBook.getSelectionModel().getSelectedItem());
+                showDialog();
+            }
+        });
+    }
+
+
+    public void setMainStage(Stage mainStage) {
+        this.mainStage = mainStage;
+
     }
 }

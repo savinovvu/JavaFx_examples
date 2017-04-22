@@ -34,7 +34,6 @@ public class CollectionAddressBook implements AddressBook {
         personList.add(new Person("Петров Петр", "65464654"));
         personList.add(new Person("Бегемотов бегемот", "123234234"));
         personList.add(new Person("Хороший хорош", "234234234"));
-
         personList.add(new Person("Моржов морж", "65432"));
     }
 }

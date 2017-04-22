@@ -36,7 +36,8 @@ public class Person {
     }
 
     public Person() {
-
+        fio = new SimpleStringProperty();
+        phone = new SimpleStringProperty();
     }
 
     @Override
