@@ -1,7 +1,9 @@
 package ru.inbox.savinov_vu.controllers;
 
 
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -22,6 +24,8 @@ import java.util.ResourceBundle;
 public class MainController implements Initializable {
 
     CollectionAddressBook addressBook = new CollectionAddressBook();
+
+    private ObservableList<Person> backupList;
 
     private Stage mainStage;
 
@@ -55,10 +59,11 @@ public class MainController implements Initializable {
     private FXMLLoader fxmlLoader = new FXMLLoader();
     private EditDialogController editDialogController;
     private Stage editDialogStage;
+    private ResourceBundle resourceBundle;
 
 
     private void updateCountLabel() {
-        labelCount.setText("Количество записей: " + addressBook.getPersonList().size());
+        labelCount.setText(resourceBundle.getString("count")+": " + addressBook.getPersonList().size());
     }
 
 
@@ -91,7 +96,7 @@ public class MainController implements Initializable {
     private void showDialog() {
         if (editDialogStage == null) {
             editDialogStage = new Stage();
-            editDialogStage.setTitle("Редактирование записи");
+            editDialogStage.setTitle(resourceBundle.getString("edit"));
             editDialogStage.setMinHeight(150);
             editDialogStage.setMinWidth(300);
             editDialogStage.setResizable(false);
@@ -105,8 +110,8 @@ public class MainController implements Initializable {
 
 
     @Override
-    @FXML
     public void initialize(URL location, ResourceBundle resources) {
+        resourceBundle = resources;
         tableAddressBook.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         columnFIO.setCellValueFactory(new PropertyValueFactory<Person, String>("fio"));
         columnPhone.setCellValueFactory(new PropertyValueFactory<Person, String>("phone"));
@@ -119,6 +124,8 @@ public class MainController implements Initializable {
 
     private void fillData() {
         addressBook.fillTestData();
+        backupList = FXCollections.observableArrayList();
+        backupList.addAll(addressBook.getPersonList());
         tableAddressBook.setItems(addressBook.getPersonList());
     }
 
@@ -145,6 +152,17 @@ public class MainController implements Initializable {
 
     public void setMainStage(Stage mainStage) {
         this.mainStage = mainStage;
+
+    }
+
+    public void actionSearch(ActionEvent actionEvent) {
+        addressBook.getPersonList().clear();
+        for (Person person : backupList) {
+            if (person.getPhone().toLowerCase().contains(txtSearch.getText().toLowerCase()) ||
+                    person.getFio().toLowerCase().contains(txtSearch.getText().toLowerCase())     ) {
+                addressBook.getPersonList().add(person);
+            }
+        }
 
     }
 }
