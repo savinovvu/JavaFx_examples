@@ -2,13 +2,18 @@ package ru.inbox.savinov_vu.controllers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import ru.inbox.savinov_vu.model.Person;
+import ru.inbox.savinov_vu.util.DialogManager;
 
-public class EditDialogController {
+import java.net.URL;
+import java.util.ResourceBundle;
+
+public class EditDialogController implements Initializable{
 
     @FXML
     private Button btnOk;
@@ -24,6 +29,8 @@ public class EditDialogController {
 
     private Person person;
 
+    private ResourceBundle resourceBundle;
+
     public void actionClose(ActionEvent actionEvent) {
         Node source = (Node) actionEvent.getSource();
         Stage stage = (Stage) source.getScene().getWindow();
@@ -38,6 +45,9 @@ public class EditDialogController {
     }
 
     public void actionSave(ActionEvent actionEvent) {
+        if (!checkValues()) {
+            return;
+        }
         person.setPhone(txtPhone.getText());
         person.setFio(txtFIO.getText());
         actionClose(actionEvent);
@@ -45,5 +55,18 @@ public class EditDialogController {
 
     public Person getPerson() {
         return person;
+    }
+
+    private boolean checkValues() {
+        if (txtFIO.getText().trim().length() == 0 || txtPhone.getText().trim().length() == 0) {
+            DialogManager.showErrorDialog("ошибка", "заполните оба поля");
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        resourceBundle = resources;
     }
 }

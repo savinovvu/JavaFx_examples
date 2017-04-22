@@ -16,9 +16,11 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ru.inbox.savinov_vu.mockBD.impls.CollectionAddressBook;
 import ru.inbox.savinov_vu.model.Person;
+import ru.inbox.savinov_vu.util.DialogManager;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
@@ -63,7 +65,7 @@ public class MainController implements Initializable {
 
 
     private void updateCountLabel() {
-        labelCount.setText(resourceBundle.getString("count")+": " + addressBook.getPersonList().size());
+        labelCount.setText(resourceBundle.getString("count") + ": " + addressBook.getPersonList().size());
     }
 
 
@@ -82,16 +84,31 @@ public class MainController implements Initializable {
                 addressBook.add(editDialogController.getPerson());
                 break;
             case "btnEdit":
-                editDialogController.setPerson((Person) tableAddressBook.getSelectionModel().getSelectedItem());
+                Person selectedPerson = (Person) tableAddressBook.getSelectionModel().getSelectedItem();
+                if (!personIsSelected(selectedPerson)) {
+                    return;
+                }
+                editDialogController.setPerson(selectedPerson);
                 showDialog();
                 break;
             case "btnDelete":
-                addressBook.delete((Person) tableAddressBook.getSelectionModel().getSelectedItem());
+                Person selPerson = (Person) tableAddressBook.getSelectionModel().getSelectedItem();
+                if (!personIsSelected(selPerson)) {
+                    return;
+                }
+                addressBook.delete(selPerson);
                 return;
         }
-
-
     }
+
+    private boolean personIsSelected(Person selectedPerson) {
+        if (Objects.isNull(selectedPerson)) {
+            DialogManager.showInfoDialog("ошибка", "произведите выбор");
+            return false;
+        }
+        return true;
+    }
+
 
     private void showDialog() {
         if (editDialogStage == null) {
@@ -159,7 +176,7 @@ public class MainController implements Initializable {
         addressBook.getPersonList().clear();
         for (Person person : backupList) {
             if (person.getPhone().toLowerCase().contains(txtSearch.getText().toLowerCase()) ||
-                    person.getFio().toLowerCase().contains(txtSearch.getText().toLowerCase())     ) {
+                    person.getFio().toLowerCase().contains(txtSearch.getText().toLowerCase())) {
                 addressBook.getPersonList().add(person);
             }
         }
